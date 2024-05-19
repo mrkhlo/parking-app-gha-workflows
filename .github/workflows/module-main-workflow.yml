@@ -22,7 +22,7 @@ jobs:
           cache: 'maven'
           cache-dependency-path: '**/pom.xml'
       - name: Build and run tests
-        run: mvn test -pl {{ inputs.SERVICE_MODULE_NAME }} -am
+        run: mvn test -pl ${{ inputs.SERVICE_MODULE_NAME }} -am
 
   sonar-analyze:
     runs-on: ubuntu-latest
@@ -58,13 +58,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build image
-        run: mvn install -pl {{ inputs.SERVICE_MODULE_NAME }} -am -DskipTests
+        run: mvn install -pl ${{ inputs.SERVICE_MODULE_NAME }} -am -DskipTests
       - name: Get commit hash
         id: get-commit-hash
         run: |
           short_sha=$(git rev-parse --short ${{ github.sha }})
           echo "SHORT_SHA=$short_sha" >> $GITHUB_OUTPUT
       - name: Tag image
-        run: docker tag {{ env.PROJECT_ID }}/{{ inputs.SERVICE_IMAGE_NAME }}:1.0-SNAPSHOT ${{ secrets.DOCKERHUB_USERNAME }}/{{ inputs.SERVICE_IMAGE_NAME }}:${{ steps.get-commit-hash.outputs.SHORT_SHA }}
+        run: docker tag ${{ env.PROJECT_ID }}/${{ inputs.SERVICE_IMAGE_NAME }}:1.0-SNAPSHOT ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.SERVICE_IMAGE_NAME }}:${{ steps.get-commit-hash.outputs.SHORT_SHA }}
       - name: Publish image to DockerHub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/{{ inputs.SERVICE_IMAGE_NAME }}:${{ steps.get-commit-hash.outputs.SHORT_SHA }}
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.SERVICE_IMAGE_NAME }}:${{ steps.get-commit-hash.outputs.SHORT_SHA }}
