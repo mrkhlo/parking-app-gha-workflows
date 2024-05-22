@@ -67,8 +67,8 @@ jobs:
         run: |
           branch_name=${{ github.ref_name }}
           short_sha=$(git rev-parse --short ${{ github.sha }})
-          TAG = "$branch_name-$short_sha"
-          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          tag="$branch_name-$short_sha"
+          echo "TAG=$tag" >> $GITHUB_OUTPUT
       - name: Tag image
         run: docker tag ${{ env.PROJECT_ID }}/${{ inputs.SERVICE_IMAGE_NAME }}:1.0-SNAPSHOT ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.DOCKERHUB_SERVICE_REPOSITORY_NAME }}:${{ steps.create-tag.outputs.TAG }}
       - name: Publish image to DockerHub
