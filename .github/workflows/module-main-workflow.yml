@@ -25,7 +25,7 @@ jobs:
           cache: 'maven'
           cache-dependency-path: '**/pom.xml'
       - name: Build and run tests
-        run: mvn test -pl ${{ inputs.SERVICE_MODULE_NAME }} -am
+        run: mvn test # Since it's a multimodul project, and there are shared modules, we have to test the whole project
 
   sonar-analyze:
     runs-on: ubuntu-latest
