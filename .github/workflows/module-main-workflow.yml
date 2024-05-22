@@ -62,12 +62,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build image
         run: mvn install -pl ${{ inputs.SERVICE_MODULE_NAME }} -am -DskipTests
-      - name: Get commit hash
-        id: get-commit-hash
+      - name: Create tag
+        id: create-tag
         run: |
+          branch_name=${{ github.ref_name }}
           short_sha=$(git rev-parse --short ${{ github.sha }})
-          echo "SHORT_SHA=$short_sha" >> $GITHUB_OUTPUT
+          TAG = "$branch_name-$short_sha"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
       - name: Tag image
-        run: docker tag ${{ env.PROJECT_ID }}/${{ inputs.SERVICE_IMAGE_NAME }}:1.0-SNAPSHOT ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.DOCKERHUB_SERVICE_REPOSITORY_NAME }}:${{ steps.get-commit-hash.outputs.SHORT_SHA }}
+        run: docker tag ${{ env.PROJECT_ID }}/${{ inputs.SERVICE_IMAGE_NAME }}:1.0-SNAPSHOT ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.DOCKERHUB_SERVICE_REPOSITORY_NAME }}:${{ steps.create-tag.outputs.TAG }}
       - name: Publish image to DockerHub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.DOCKERHUB_SERVICE_REPOSITORY_NAME }}:${{ steps.get-commit-hash.outputs.SHORT_SHA }}
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.DOCKERHUB_SERVICE_REPOSITORY_NAME }}:${{ steps.create-tag.outputs.TAG }}
